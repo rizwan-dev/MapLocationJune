@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
@@ -26,6 +27,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -170,5 +174,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void stopTracking(View view){
 
+    }
+
+    /**
+     * Creates a callback for receiving location events.
+     */
+    private void createLocationCallback() {
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+
+                mCurrentLocation = locationResult.getLastLocation();
+                mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+
+//                drawPolylineGoogleMap(mCurrentLocation);
+            }
+        };
+    }
+
+    /**
+     * Sets up the location request. Android has two location request settings:
+     * {@code ACCESS_COARSE_LOCATION} and {@code ACCESS_FINE_LOCATION}. These settings control
+     * the accuracy of the current location. This sample uses ACCESS_FINE_LOCATION, as defined in
+     * the AndroidManifest.xml.
+     * <p/>
+     * When the ACCESS_FINE_LOCATION setting is specified, combined with a fast update
+     * interval (5 seconds), the Fused Location Provider API returns location updates that are
+     * accurate to within a few feet.
+     * <p/>
+     * These settings are appropriate for mapping applications that show real-time location
+     * updates.
+     */
+    private void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+
+        // Sets the desired interval for active location updates. This interval is
+        // inexact. You may not receive updates at all if no location sources are available, or
+        // you may receive them slower than requested. You may also receive updates faster than
+        // requested if other applications are requesting location at a faster interval.
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+
+        // Sets the fastest rate for active location updates. This interval is exact, and your
+        // application will never receive updates faster than this value.
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 }
