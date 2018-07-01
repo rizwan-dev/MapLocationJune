@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -25,6 +26,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
     private static final int MY_PERMISSIONS_REQUEST_GET_LOCATION = 101;
+
+    private static final int UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    private static final int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS/2;
+
     private static final String TAG = MapsActivity.class.getSimpleName();
 
     @Override
@@ -56,7 +61,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showCurrentLocation() {
-        if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if(ContextCompat
+                .checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
@@ -65,7 +72,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             if(location!=null){
                                 LatLng vimanNagar = new LatLng(location.getLatitude(), location.getLongitude());
                                 mMap.addMarker(new MarkerOptions().position(vimanNagar).title("Viman Nagar"));
-                                mMap.moveCamera(CameraUpdateFactory.newLatLng(vimanNagar));
+                                CameraUpdate zoom = CameraUpdateFactory.newLatLngZoom(
+                                        vimanNagar, 15);
+                                mMap.animateCamera(zoom);
                             }
                             else{
                                 Toast.makeText(getApplicationContext(), "Enable gps", Toast.LENGTH_LONG).show();
@@ -76,7 +85,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
         else{
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_GET_LOCATION);
+            ActivityCompat.
+                    requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            MY_PERMISSIONS_REQUEST_GET_LOCATION);
 
         }
     }
