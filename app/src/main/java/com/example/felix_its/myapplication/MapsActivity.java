@@ -222,4 +222,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
+
+    /**
+     * Uses a {@link com.google.android.gms.location.LocationSettingsRequest.Builder} to build
+     * a {@link com.google.android.gms.location.LocationSettingsRequest} that is used for checking
+     * if a device has the needed location settings.
+     */
+    private void buildLocationSettingsRequest() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        mLocationSettingsRequest = builder.build();
+    }
+
+    private void googleFusedLocationSetUp() {
+        mRequestingLocationUpdates = false;
+        mLastUpdateTime = "";
+        mSettingsClient = LocationServices.getSettingsClient(this);
+
+        // Kick off the process of building the LocationCallback, LocationRequest, and
+        // LocationSettingsRequest objects.
+        createLocationCallback();
+        createLocationRequest();
+        buildLocationSettingsRequest();
+    }
 }
