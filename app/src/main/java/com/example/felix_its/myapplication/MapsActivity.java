@@ -13,7 +13,11 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,6 +35,54 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private static final int UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
     private static final int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS/2;
+
+    /**
+     * Provides access to the Location Settings API.
+     */
+    private SettingsClient mSettingsClient;
+
+    /**
+     * Stores parameters for requests to the FusedLocationProviderApi.
+     */
+    private LocationRequest mLocationRequest;
+
+    /**
+     * Callback for Location events.
+     */
+    private LocationCallback mLocationCallback;
+
+
+    /**
+     * Represents a geographical location.
+     */
+    private Location mCurrentLocation;
+
+    /**
+     * Time when the location was updated represented as a String.
+     */
+    private String mLastUpdateTime;
+
+
+    /**
+     * Stores the types of location services the client is interested in using. Used for checking
+     * settings to determine if the device has optimal location settings.
+     */
+    private LocationSettingsRequest mLocationSettingsRequest;
+
+
+    /**
+     * Tracks the status of the location updates request. Value changes when the user presses the
+     * Start Updates and Stop Updates buttons.
+     */
+    private Boolean mRequestingLocationUpdates;
+
+
+    /**
+     * Constant used in the location settings dialog.
+     */
+    private static final int REQUEST_CHECK_SETTINGS = 0x1;
+
+
 
     private static final String TAG = MapsActivity.class.getSimpleName();
 
