@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -33,7 +34,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -41,6 +45,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -103,6 +108,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private Button btnStart, btnStop;
 
+    private Marker mGoogleMarker;
+    private Polyline mPolylineGoogle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,7 +141,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        showCurrentLocation();
+//        showCurrentLocation();
     }
 
     private void showCurrentLocation() {
@@ -203,7 +211,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mCurrentLocation = locationResult.getLastLocation();
                 mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
-//                drawPolylineGoogleMap(mCurrentLocation);
+                Toast.makeText(getApplicationContext(), mLastUpdateTime, Toast.LENGTH_SHORT).show();
+
+                drawPolylineGoogleMap(mCurrentLocation);
             }
         };
     }
@@ -331,6 +341,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
     }
+
+
+    private void drawPolylineGoogleMap(Location mCurrentLocation) {
+
+        LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+
+
+        if (mGoogleMarker == null) {
+            mGoogleMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Current Location"));
+        } else {
+            mGoogleMarker.setPosition(latLng);
+        }
+
+        if (mPolylineGoogle == null) {
+            PolylineOptions polylineOptions = new PolylineOptions();
+            polylineOptions.width(10);
+            polylineOptions.color(Color.CYAN);
+            polylineOptions.geodesic(true);
+            polylineOptions.add(latLng);
+            mPolylineGoogle = mMap.addPolyline(polylineOptions);
+        } else {
+            List<LatLng> points = mPolylineGoogle.getPoints();
+            points.add(latLng);
+            mPolylineGoogle.setPoints(points);
+        }
+    }
+
 
 
 }
